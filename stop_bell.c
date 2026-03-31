@@ -10,7 +10,7 @@
 
 /*********************************************************************************************************************/
 /*-------------------------------------------------Global variables--------------------------------------------------*/
-volatile StopBtnState g_stopState = STATE_OFF;
+extern StopBtnState g_stopBtnState;
 /*********************************************************************************************************************/
 
 /*********************************************************************************************************************/
@@ -25,9 +25,9 @@ volatile StopBtnState g_stopState = STATE_OFF;
 /*---------------------------------------------Function Implementations----------------------------------------------*/
 void onStopButtonLED(void)
 {
-    if(g_stopState == STATE_OFF)
+    if(g_stopBtnState == STATE_STOP_BTN_OFF)
     {
-        g_stopState = STATE_ON;
+        g_stopBtnState = STATE_STOP_BTN_ON;
         playBuzzer();
         IfxPort_setPinHigh(STOP_LED_1.port, STOP_LED_1.pinIndex); // LED ON
     }
@@ -35,9 +35,9 @@ void onStopButtonLED(void)
 
 void offStopButtonLED()
 {
-    if(g_stopState == STATE_ON)
+    if(g_stopBtnState == STATE_STOP_BTN_ON)
     {
-        g_stopState = STATE_OFF;
+        g_stopBtnState = STATE_STOP_BTN_OFF;
         IfxPort_setPinLow(STOP_LED_1.port, STOP_LED_1.pinIndex); // LED OFF
     }
 }

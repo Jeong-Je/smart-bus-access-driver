@@ -1,7 +1,6 @@
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
 #include "init_eru.h"
-#include "stop_bell.h"
 /*********************************************************************************************************************/
 
 /*********************************************************************************************************************/
@@ -27,6 +26,7 @@ void initERU()
     uint16 password = IfxScuWdt_getSafetyWatchdogPasswordInline();
     IfxScuWdt_clearSafetyEndinitInline(password);
 
+    /*일반 하차벨 버튼 인터럽트 설정 */
     //Port 02.1을 Pull-Down Input으로 Set
     MODULE_P02.IOCR0.B.PC1 = 0x01;
 
@@ -44,17 +44,46 @@ void initERU()
     MODULE_SCU.EICR[1].B.INP0 = 0;
 
     // OGU0은 IGCR[0]/IGP0임 Pattern 고려 없이
-    // GOUT/IOUT 출력라인을 Trigger event 반응하게 Set
     MODULE_SCU.IGCR[0].B.IGP0 = 1;
 
 
     //Interrupt를 위해 SCU의 SRC설정
     volatile Ifx_SRC_SRCR *src;
-    src = (volatile Ifx_SRC_SRCR*) (&MODULE_SRC.SCU.SCUERU);
+    src = (volatile Ifx_SRC_SRCR*) (&MODULE_SRC.SCU.SCUERU[0]);
     src->B.SRPN = STOP_BTN_ON_ISR_PRIORITY;
     src->B.TOS = 0;
-    src->B.CLRR = 1; /* clear request */
-    src->B.SRE = 1; /* interrupt enable */
+    src->B.CLRR = 1;
+    src->B.SRE = 1;
+
+
+    /*장애인 하차벨 버튼 인터럽트 설정 */
+    //Port 02.0을 Pull-Down Input으로 Set
+    MODULE_P02.IOCR0.B.PC0 = 0x01;
+
+    /* EICR.EXIS 레지스터 설정 */
+    MODULE_SCU.EICR[1].B.EXIS1 = 2;   //
+
+    /* rising, falling edge 트리거 설정 */
+    MODULE_SCU.EICR[1].B.REN1 = 1;    //
+    MODULE_SCU.EICR[1].B.FEN1 = 0;    //
+
+    // Channel 2의 Trigger Event 활성화
+    MODULE_SCU.EICR[1].B.EIEN1 = 1;   //
+
+    // OGU 1으로 보내기
+    MODULE_SCU.EICR[1].B.INP1 = 1;    //
+
+    // OGU1 활성화
+    MODULE_SCU.IGCR[0].B.IGP1 = 1;    //
+
+
+    //Interrupt를 위해 SCU의 SRC설정 (기존 변수 유지)
+    volatile Ifx_SRC_SRCR *src1;
+    src1 = (volatile Ifx_SRC_SRCR*) (&MODULE_SRC.SCU.SCUERU[1]);
+    src1->B.SRPN = STOP_BTN_ON_ISR_PRIORITY;
+    src1->B.TOS = 0;
+    src1->B.CLRR = 1;
+    src1->B.SRE = 1;
 
     IfxScuWdt_setSafetyEndinitInline(password);
 }

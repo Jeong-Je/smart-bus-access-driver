@@ -8,14 +8,23 @@
 #include "IfxSrc.h"
 
 #include "stop_bell.h"
+#include "state.h"
+#include "macro.h"
 
 IFX_ALIGN(4) IfxCpu_syncEvent cpuSyncEvent = 0;
+
+// 하차벨 상태
+volatile StopBtnState g_stopBtnState = STATE_STOP_BTN_OFF;
+// 장애인 하차벨 상태
+volatile DisabledStopBtnState g_disabledStopBtnState = STATE_DISABLED_STOP_BTN_OFF;
 
 void initERU();
 
 IFX_INTERRUPT(onStopBtnISR, 0, STOP_BTN_ON_ISR_PRIORITY);
+IFX_INTERRUPT(onDisabledStopBtnISR, 0, DISABLED_STOP_BTN_ON_ISR_PRIORITY);
 
 void onStopBtnISR(void);
+void onDisabledStopBtnISR(void);
 
 void core0_main(void)
 {
@@ -45,5 +54,11 @@ void core0_main(void)
 
 void onStopBtnISR()
 {
+    onStopButtonLED();
+}
+
+void onDisabledStopBtnISR(void)
+{
+    g_disabledStopBtnState = STATE_DISABLED_STOP_BTN_ON;
     onStopButtonLED();
 }
