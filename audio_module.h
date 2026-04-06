@@ -55,6 +55,7 @@ void playDoorOpenSound(void);
 void playDoorCloseSound(void);
 void playSlopeOpenSound(void);
 void playSlopeCloseSound(void);
+void playFireAlarmSound(void);
 
 
 #endif /* AUDIO_MODULE_H_ */

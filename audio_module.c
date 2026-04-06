@@ -88,6 +88,7 @@ void playDoorOpenSound(void);
 void playDoorCloseSound(void);
 void playSlopeOpenSound(void);
 void playSlopeCloseSound(void);
+void playFireAlarmSound(void);
 
 /*********************************************************************************************************************/
 /*---------------------------------------------Function Implementations----------------------------------------------*/
@@ -182,4 +183,9 @@ void playSlopeOpenSound(void)
 void playSlopeCloseSound(void)
 {
     playTrack(4);
+}
+
+void playFireAlarmSound(void)
+{
+    playTrack(5);
 }
